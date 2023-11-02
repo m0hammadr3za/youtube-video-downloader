@@ -1,5 +1,74 @@
+import sys
+import re
 import yt_dlp
 
+def download_youtube_video():
+    url = get_video_url()
+
+    video_formats, audio_formats = get_video_details(url)
+
+    print()
+    show_formats(video_formats)
+    video_formats_keys = list(video_formats.keys())
+
+    print()
+    show_formats(audio_formats, len(video_formats_keys))
+    audio_formats_keys = list(audio_formats.keys())
+
+    print()
+    print(f"[ {len(video_formats_keys) + len(audio_formats_keys)} ] Video Thumbnail", end="\n\n")
+
+    user_choice = int(input("Enter the number you want to download: "))
+
+    if user_choice < len(video_formats_keys):
+        audio_choice = int(input("Enter the number for the aduio to mix with this video: "))
+        print()
+
+        selected_video_format = video_formats[video_formats_keys[user_choice]]
+        selected_audio_format = audio_formats[audio_formats_keys[audio_choice - len(video_formats_keys)]]
+
+        print(f"Downloading: {video_formats_keys[user_choice]} with {audio_formats_keys[user_choice - len(video_formats_keys)]} audio...")
+        download_video(url, selected_video_format['format_id'], selected_audio_format['format_id'])
+
+    elif user_choice < len(video_formats_keys) + len(audio_formats_keys):
+        selected_audio_format = audio_formats[audio_formats_keys[user_choice - len(video_formats_keys)]]
+        print(f"\nDownloading: {audio_formats_keys[user_choice - len(video_formats_keys)]}...")
+        download_audio(url, selected_audio_format['format_id'])
+
+    elif user_choice == len(video_formats_keys) + len(audio_formats_keys) + 1:
+        print("\nDownloading thumbnail...")
+        download_thumbnail(url)
+
+    else:
+        print("The number you have selected is not in this list!")
+
+    print()
+    print("Download successful")
+
+#
+#
+#
+
+# Get and validate video url
+def get_video_url():
+    url = input("Enter the video URL: ")
+
+    video_id_match = re.search(
+        r'(?:https?:\/\/)?(?:www\.)?(?:m\.)?(?:youtube\.com\/watch\?v=|youtube\.com\/v\/|youtube\.com\/embed\/|youtu\.be\/)([a-zA-Z0-9_-]{11})',
+        url
+    )
+
+    if video_id_match:
+        return f'https://www.youtube.com/watch?v={video_id_match.group(1)}'
+    else:
+        print("Invalid url!")
+        sys.exit()
+
+#
+#
+#
+
+# Get video and audio formats
 def get_video_details(video_url):
     ydl_opts = {
         'quiet': True,
@@ -92,6 +161,11 @@ def remove_close_audio_formats(audio_formats: dict):
     
     return audio_formats_clean
 
+#
+#
+#
+
+# show vidoe and audio format options
 def show_formats(formats: dict, start_index: int = 0):
     formats_keys = list(formats.keys())
     for i in range(len(formats_keys)):
@@ -99,6 +173,10 @@ def show_formats(formats: dict, start_index: int = 0):
         filesize = readable_size(frmt['filesize'])
         ext = frmt['ext']
         print(f"[ {start_index + i} ] {formats_keys[i]} . {ext} - {filesize}")
+
+#
+#
+#
 
 def readable_size(size):
     KB = 1024
@@ -111,6 +189,10 @@ def readable_size(size):
         return f"{size/MB:.2f} MB"
     else:
         return f"{size/GB:.2f} GB"
+
+#
+#
+#
 
 def download_video(url, video_format_id, audio_format_id):
     if audio_format_id:
@@ -132,11 +214,14 @@ def download_video(url, video_format_id, audio_format_id):
     with yt_dlp.YoutubeDL(options) as ydl:
         ydl.download([url])
 
+#
+#
+#
 
 def download_audio(url, format_id):
     ydl_opts = {
         'format': f'{format_id}',
-        # 'postprocessors': [{    # add this to get mp3 files instead of original format
+        # 'postprocessors': [{    # add this to get only mp3 audio instead of the original format
         #     'key': 'FFmpegExtractAudio',
         #     'preferredcodec': 'mp3',
         # }],
@@ -145,7 +230,11 @@ def download_audio(url, format_id):
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
-        
+
+#
+#
+#
+
 def download_thumbnail(video_url):
     ydl_opts = {
         'skip_download': True,
@@ -160,45 +249,9 @@ def download_thumbnail(video_url):
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([video_url])
 
+#
+#
+#
+
 if __name__ == "__main__":
-    url = input("Enter the video URL: ")
-
-    video_formats, audio_formats = get_video_details(url)
-
-    print()
-    show_formats(video_formats)
-    video_formats_keys = list(video_formats.keys())
-
-    print()
-    show_formats(audio_formats, len(video_formats_keys))
-    audio_formats_keys = list(audio_formats.keys())
-
-    print()
-    print(f"[ {len(video_formats_keys) + len(audio_formats_keys)} ] Video Thumbnail", end="\n\n")
-
-    user_choice = int(input("Enter the number you want to download: "))
-
-    if user_choice < len(video_formats_keys):
-        audio_choice = int(input("Enter the number for the aduio to mix with this video: "))
-        print()
-
-        selected_video_format = video_formats[video_formats_keys[user_choice]]
-        selected_audio_format = audio_formats[audio_formats_keys[audio_choice - len(video_formats_keys)]]
-
-        print(f"Downloading: {video_formats_keys[user_choice]} with {audio_formats_keys[user_choice - len(video_formats_keys)]} audio...")
-        download_video(url, selected_video_format['format_id'], selected_audio_format['format_id'])
-
-    elif user_choice < len(video_formats_keys) + len(audio_formats_keys):
-        selected_audio_format = audio_formats[audio_formats_keys[user_choice - len(video_formats_keys)]]
-        print(f"\nDownloading: {audio_formats_keys[user_choice - len(video_formats_keys)]}...")
-        download_audio(url, selected_audio_format['format_id'])
-
-    elif user_choice == len(video_formats_keys) + len(audio_formats_keys) + 1:
-        print("\nDownloading thumbnail...")
-        download_thumbnail(url)
-
-    else:
-        print("The number you have selected is not in this list!")
-
-    print()
-    print("Download successful")
+    download_youtube_video = download_youtube_video()
