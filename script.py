@@ -7,35 +7,36 @@ def download_youtube_video():
 
     video_formats, audio_formats = get_video_details(url)
 
-    print()
-    show_formats(video_formats)
     video_formats_keys = list(video_formats.keys())
-
-    print()
-    show_formats(audio_formats, len(video_formats_keys))
     audio_formats_keys = list(audio_formats.keys())
 
+    video_options_len = len(video_formats_keys)
+    video_audio_options_len = video_options_len + len(audio_formats_keys)
+
+    show_formats(video_formats)
+    show_formats(audio_formats, video_options_len)
+
     print()
-    print(f"[ {len(video_formats_keys) + len(audio_formats_keys)} ] Video Thumbnail", end="\n\n")
+    print(f"[ {video_audio_options_len} ] Video Thumbnail", end="\n\n")
 
     user_choice = int(input("Enter the number you want to download: "))
 
-    if user_choice < len(video_formats_keys):
+    if user_choice < video_options_len:
         audio_choice = int(input("Enter the number for the aduio to mix with this video: "))
         print()
 
         selected_video_format = video_formats[video_formats_keys[user_choice]]
-        selected_audio_format = audio_formats[audio_formats_keys[audio_choice - len(video_formats_keys)]]
+        selected_audio_format = audio_formats[audio_formats_keys[audio_choice - video_options_len]]
 
-        print(f"Downloading: {video_formats_keys[user_choice]} with {audio_formats_keys[user_choice - len(video_formats_keys)]} audio...")
+        print(f"Downloading: {video_formats_keys[user_choice]} with {audio_formats_keys[audio_choice - video_options_len]} audio...")
         download_video(url, selected_video_format['format_id'], selected_audio_format['format_id'])
 
-    elif user_choice < len(video_formats_keys) + len(audio_formats_keys):
-        selected_audio_format = audio_formats[audio_formats_keys[user_choice - len(video_formats_keys)]]
-        print(f"\nDownloading: {audio_formats_keys[user_choice - len(video_formats_keys)]}...")
+    elif user_choice < video_audio_options_len:
+        selected_audio_format = audio_formats[audio_formats_keys[user_choice - video_options_len]]
+        print(f"\nDownloading: {audio_formats_keys[user_choice - video_options_len]}...")
         download_audio(url, selected_audio_format['format_id'])
 
-    elif user_choice == len(video_formats_keys) + len(audio_formats_keys) + 1:
+    elif user_choice == video_audio_options_len + 1:
         print("\nDownloading thumbnail...")
         download_thumbnail(url)
 
@@ -168,6 +169,7 @@ def remove_close_audio_formats(audio_formats: dict):
 # show vidoe and audio format options
 def show_formats(formats: dict, start_index: int = 0):
     formats_keys = list(formats.keys())
+    print()
     for i in range(len(formats_keys)):
         frmt = formats[formats_keys[i]]
         filesize = readable_size(frmt['filesize'])
@@ -254,4 +256,6 @@ def download_thumbnail(video_url):
 #
 
 if __name__ == "__main__":
-    download_youtube_video = download_youtube_video()
+    while True:
+        download_youtube_video()
+        print("# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #\n")
