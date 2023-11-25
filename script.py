@@ -1,8 +1,9 @@
+import os
 import sys
 import re
 import yt_dlp
 
-def download_youtube_video():
+def download_youtube_video(output_path):
     url = get_video_url()
 
     video_formats, audio_formats = get_video_details(url)
@@ -29,16 +30,16 @@ def download_youtube_video():
         selected_audio_format = audio_formats[audio_formats_keys[audio_choice - video_options_len]]
 
         print(f"Downloading: {video_formats_keys[user_choice]} with {audio_formats_keys[audio_choice - video_options_len]} audio...")
-        download_video(url, selected_video_format['format_id'], selected_audio_format['format_id'])
+        download_video(url, selected_video_format['format_id'], selected_audio_format['format_id'], output_path)
 
     elif user_choice < video_audio_options_len:
         selected_audio_format = audio_formats[audio_formats_keys[user_choice - video_options_len]]
         print(f"\nDownloading: {audio_formats_keys[user_choice - video_options_len]}...")
-        download_audio(url, selected_audio_format['format_id'])
+        download_audio(url, selected_audio_format['format_id'], output_path)
 
     elif user_choice == video_audio_options_len + 1:
         print("\nDownloading thumbnail...")
-        download_thumbnail(url)
+        download_thumbnail(url, output_path)
 
     else:
         print("The number you have selected is not in this list!")
@@ -46,11 +47,18 @@ def download_youtube_video():
     print()
     print("Download successful")
 
-#
-#
-#
+def get_output_path():
+    while True:
+        path = input("Enter the directory path for downloads or press Enter to place them in the current directory: ").strip()
+        if path == "":
+            print("Downloaded files will be place in the same directory!")
+            return None
+        if os.path.isdir(path):
+            print(f'Downloaded files will be place in "{path}"!')
+            return path
+        else:
+            print("Invalid path or the directory does not exist. Please try again.\n")
 
-# Get and validate video url
 def get_video_url():
     url = input("Enter the video URL: ")
 
@@ -65,11 +73,6 @@ def get_video_url():
         print("Invalid url!")
         sys.exit()
 
-#
-#
-#
-
-# Get video and audio formats
 def get_video_details(video_url):
     ydl_opts = {
         'quiet': True,
@@ -81,6 +84,8 @@ def get_video_details(video_url):
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info_dict = ydl.extract_info(video_url, download=False)
+
+        print(info_dict["title"])
 
         all_formats = info_dict["formats"]
         all_formats_reversed = all_formats.copy()
@@ -162,11 +167,6 @@ def remove_close_audio_formats(audio_formats: dict):
     
     return audio_formats_clean
 
-#
-#
-#
-
-# show vidoe and audio format options
 def show_formats(formats: dict, start_index: int = 0):
     formats_keys = list(formats.keys())
     print()
@@ -175,10 +175,6 @@ def show_formats(formats: dict, start_index: int = 0):
         filesize = readable_size(frmt['filesize'])
         ext = frmt['ext']
         print(f"[ {start_index + i} ] {formats_keys[i]} . {ext} - {filesize}")
-
-#
-#
-#
 
 def readable_size(size):
     KB = 1024
@@ -192,15 +188,13 @@ def readable_size(size):
     else:
         return f"{size/GB:.2f} GB"
 
-#
-#
-#
+def download_video(url, video_format_id, audio_format_id, output_path):
+    outtmpl = '%(title)s.%(ext)s' if output_path is None else os.path.join(output_path, '%(title)s.%(ext)s')
 
-def download_video(url, video_format_id, audio_format_id):
     if audio_format_id:
         options = {
             'format': f'{video_format_id}+{audio_format_id}',
-            'outtmpl': '%(title)s.%(ext)s',
+            'outtmpl': outtmpl,
             'postprocessors': [{
                 'key': 'FFmpegVideoConvertor',
                 'preferedformat': 'mp4',
@@ -216,31 +210,27 @@ def download_video(url, video_format_id, audio_format_id):
     with yt_dlp.YoutubeDL(options) as ydl:
         ydl.download([url])
 
-#
-#
-#
+def download_audio(url, format_id, output_path):
+    outtmpl = '%(title)s.%(ext)s' if output_path is None else os.path.join(output_path, '%(title)s.%(ext)s')
 
-def download_audio(url, format_id):
     ydl_opts = {
         'format': f'{format_id}',
         # 'postprocessors': [{    # add this to get only mp3 audio instead of the original format
         #     'key': 'FFmpegExtractAudio',
         #     'preferredcodec': 'mp3',
         # }],
-        'outtmpl': '%(title)s.%(ext)s',
+        'outtmpl': outtmpl,
     }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
 
-#
-#
-#
-
-def download_thumbnail(video_url):
+def download_thumbnail(video_url, output_path):
+    outtmpl = 'thumbnail.%(ext)s' if output_path is None else os.path.join(output_path, 'thumbnail.%(ext)s')
+    
     ydl_opts = {
         'skip_download': True,
-        'outtmpl': 'thumbnail.%(ext)s',
+        'outtmpl': outtmpl,
         'postprocessors': [{
             'key': 'FFmpegMetadata',
         }],
@@ -251,11 +241,10 @@ def download_thumbnail(video_url):
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([video_url])
 
-#
-#
-#
-
 if __name__ == "__main__":
+    output_path = get_output_path()
+    print()
+
     while True:
-        download_youtube_video()
+        download_youtube_video(output_path)
         print("# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #\n")
