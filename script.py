@@ -1,11 +1,18 @@
 import yt_dlp
-from inputs import get_output_path, get_video_url, get_user_selected_option, get_user_preferred_audio_for_video
 from processors import get_video_formats, get_audio_formats
 from utils import readable_size
 from downloader import download_video, download_audio, download_thumbnail
 
+from inputs import \
+    get_output_path, \
+    get_flag, \
+    get_video_url, \
+    get_user_selected_option, \
+    get_user_preferred_audio_for_video
+
 def download_youtube_video():
     output_path = get_output_path()
+    flag = get_flag()
     
     while True:
         try:
@@ -20,10 +27,10 @@ def download_youtube_video():
             video_formats = get_video_formats(formats)
             audio_formats = get_audio_formats(formats)
 
-            show_download_options(video_formats, audio_formats)
-            user_choice = get_user_selected_option(video_formats, audio_formats)
-
-            handle_selected_option_download(url, user_choice, video_formats, audio_formats, output_path)
+            if flag:
+                download_with_flag(flag, url, video_formats, audio_formats, output_path)
+            else:
+                download_with_options(url, video_formats, audio_formats, output_path)
 
             print()
             print("Download successful")
@@ -46,6 +53,44 @@ def get_video_info(video_url):
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         video_info = ydl.extract_info(video_url, download=False)
         return video_info
+    
+def download_with_flag(flag, url, video_formats, audio_formats, output_path):
+    if flag == 'best-v':
+        handle_best_v_download(url, video_formats, audio_formats, output_path)
+    elif flag == 'best-a':
+        handle_best_a_download(url, audio_formats, output_path)
+    else:
+        handle_thumbnail_download(url, output_path)
+
+def download_with_options(url, video_formats, audio_formats, output_path):
+    show_download_options(video_formats, audio_formats)
+    user_choice = get_user_selected_option(video_formats, audio_formats)
+
+    handle_selected_option_download(url, user_choice, video_formats, audio_formats, output_path)
+    
+def handle_best_v_download(url, video_formats, audio_formats, output_path):
+    video_format_keys = list(video_formats.keys())
+    best_video_format_key = video_format_keys[0]
+    best_video_format = video_formats[best_video_format_key]
+    video_format_id = best_video_format['format_id']
+
+    audio_format_keys = list(audio_formats.keys())
+    best_audio_format_key = audio_format_keys[0]
+    best_audio_format = audio_formats[best_audio_format_key]
+    audio_format_id = best_audio_format['format_id']
+
+    download_video(url, video_format_id, audio_format_id, output_path)
+
+def handle_best_a_download(url, audio_formats, output_path):
+    audio_format_keys = list(audio_formats.keys())
+    best_audio_format_key = audio_format_keys[0]
+    best_audio_format = audio_formats[best_audio_format_key]
+    audio_format_id = best_audio_format['format_id']
+
+    download_audio(url, audio_format_id['format_id'], output_path)
+
+def handle_thumbnail_download(url, output_path):
+    download_thumbnail(url, output_path)
     
 def show_download_options(video_formats, audio_formats):
     show_options_list(video_formats)

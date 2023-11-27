@@ -13,6 +13,34 @@ def get_output_path():
         else:
             print("Invalid path or the directory does not exist. Please try again!\n")
 
+def get_flag():
+    print("You can user a flag to automatically select download options. Available flags are: ")
+    print(f"    [best-v] download best video with best audio")
+    print(f"    [best-a] download best audio")
+    print(f"    [thumbnail] download thumbnail")
+    print()
+    
+    while True:
+        user_flag = input("Enter the flag you want to add, like \"best-v\". If you don't want to add any flags just press enter: ")
+
+        if user_flag == '':
+            print("You didn't add any flags.\n")
+            return None
+        
+        if 'best-v' in user_flag:
+            print("Now for every link you enter the best video quality with the best audio quality will be selected for download automatically.\n")
+            return 'best-v'
+        
+        if 'best-a' in user_flag:
+            print("Now for every link you enter the best audio quality will be selected for download automatically.\n")
+            return 'best-v'
+        
+        if 'best-v' in user_flag:
+            print("Now for every link you enter the thumbnail of the video will be downloaded.\n")
+            return 'thumbnail'
+            
+        print("Invalid flag!\n")
+
 def get_video_url():
     while True:
         url = input("Enter the video URL: ")
