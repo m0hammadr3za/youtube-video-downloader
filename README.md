@@ -2,6 +2,8 @@
 
 This Python application allows users to download videos, audio, and thumbnails from YouTube. It utilizes the `yt_dlp` library to extract video details, select the desired format, and manage the download process.
 
+![Screenshot of Python YouTube Video Downloader](screenshot.png "Screenshot of Application")
+
 ## Requirements
 
 -   Python 3.x
