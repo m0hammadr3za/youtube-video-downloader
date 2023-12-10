@@ -18,6 +18,7 @@ def get_flag():
     print(f"    [best-v] download best video with best audio")
     print(f"    [best-a] download best audio")
     print(f"    [thumbnail] download thumbnail")
+    print(f"    [1080p] download 1080p with best audio(download best quality if 1080p is not available)")
     print()
     
     while True:
@@ -28,14 +29,18 @@ def get_flag():
             return None
         
         if 'best-v' in user_flag:
-            print("Now for every link you enter the best video quality with the best audio quality will be selected for download automatically.\n")
+            print("Now for every link you enter best video and audio quality will be automatically selected for download.\n")
             return 'best-v'
+        
+        if '1080p' in user_flag:
+            print("Now for every link you enter 1080p video quality and best audio quality will be automatically selected for download.\n")
+            return '1080p'
         
         if 'best-a' in user_flag:
             print("Now for every link you enter the best audio quality will be selected for download automatically.\n")
             return 'best-v'
         
-        if 'best-v' in user_flag:
+        if 'thumbnail' in user_flag:
             print("Now for every link you enter the thumbnail of the video will be downloaded.\n")
             return 'thumbnail'
             

@@ -57,9 +57,11 @@ def get_video_info(video_url):
 def download_with_flag(flag, url, video_formats, audio_formats, output_path):
     if flag == 'best-v':
         handle_best_v_download(url, video_formats, audio_formats, output_path)
+    elif flag == '1080p':
+        handle_1080p_download(url, video_formats, audio_formats, output_path)
     elif flag == 'best-a':
         handle_best_a_download(url, audio_formats, output_path)
-    else:
+    elif flag == 'thumbnail':
         handle_thumbnail_download(url, output_path)
 
 def download_with_options(url, video_formats, audio_formats, output_path):
@@ -79,7 +81,28 @@ def handle_best_v_download(url, video_formats, audio_formats, output_path):
     best_audio_format = audio_formats[best_audio_format_key]
     audio_format_id = best_audio_format['format_id']
 
+    print(f"Downloading {best_video_format_key} video with {best_audio_format_key} audio...")
     download_video(url, video_format_id, audio_format_id, output_path)
+
+def handle_1080p_download(url, video_formats, audio_formats, output_path):
+    video_format_keys = list(video_formats.keys())
+    target_video_quality_format_key = [key for key in video_format_keys if "1080p" in key]
+
+    if len(target_video_quality_format_key) == 0:
+        video_format_keys[0]
+    else:
+        target_video_quality_format_key = target_video_quality_format_key[0]
+
+    target_video_quality_format = video_formats[target_video_quality_format_key]
+    target_video_id = target_video_quality_format['format_id']
+
+    audio_format_keys = list(audio_formats.keys())
+    best_audio_format_key = audio_format_keys[0]
+    best_audio_format = audio_formats[best_audio_format_key]
+    audio_format_id = best_audio_format['format_id']
+
+    print(f"Downloading {target_video_quality_format_key} video with {best_audio_format_key} audio...")
+    download_video(url, target_video_id, audio_format_id, output_path)
 
 def handle_best_a_download(url, audio_formats, output_path):
     audio_format_keys = list(audio_formats.keys())
@@ -87,9 +110,11 @@ def handle_best_a_download(url, audio_formats, output_path):
     best_audio_format = audio_formats[best_audio_format_key]
     audio_format_id = best_audio_format['format_id']
 
+    print(f"Downloading {best_audio_format_key} audio...")
     download_audio(url, audio_format_id['format_id'], output_path)
 
 def handle_thumbnail_download(url, output_path):
+    print("Downloading thumbnail...")
     download_thumbnail(url, output_path)
     
 def show_download_options(video_formats, audio_formats):
