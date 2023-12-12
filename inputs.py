@@ -16,9 +16,10 @@ def get_output_path():
 def get_flag():
     print("You can user a flag to automatically select download options. Available flags are: ")
     print(f"    [best-v] download best video with best audio")
+    print(f"    [1080p] download 1080p with best audio(download best quality if 1080p is not available)")
+    print(f"    [1440p] download 1440p with best audio(download best quality if 1440p is not available)")
     print(f"    [best-a] download best audio")
     print(f"    [thumbnail] download thumbnail")
-    print(f"    [1080p] download 1080p with best audio(download best quality if 1080p is not available)")
     print()
     
     while True:
@@ -33,8 +34,12 @@ def get_flag():
             return 'best-v'
         
         if '1080p' in user_flag:
-            print("Now for every link you enter 1080p video quality and best audio quality will be automatically selected for download.\n")
+            print("Now for every link you enter, 1080p video quality and best audio quality will be automatically selected for download.\n")
             return '1080p'
+        
+        if '1440p' in user_flag:
+            print("Now for every link you enter, 1440p video quality and best audio quality will be automatically selected for download.\n")
+            return '1440p'
         
         if 'best-a' in user_flag:
             print("Now for every link you enter the best audio quality will be selected for download automatically.\n")
