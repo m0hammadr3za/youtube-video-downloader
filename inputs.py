@@ -18,6 +18,7 @@ def get_flag():
     print(f"    [best-v] download best video with best audio")
     print(f"    [1080p] download 1080p with best audio(download best quality if 1080p is not available)")
     print(f"    [1440p] download 1440p with best audio(download best quality if 1440p is not available)")
+    print(f"    [2160p] download 2160p with best audio(download best quality if 2160p is not available)")
     print(f"    [best-a] download best audio")
     print(f"    [thumbnail] download thumbnail")
     print()
@@ -40,6 +41,10 @@ def get_flag():
         if '1440p' in user_flag:
             print("Now for every link you enter, 1440p video quality and best audio quality will be automatically selected for download.\n")
             return '1440p'
+        
+        if '2160p' in user_flag:
+            print("Now for every link you enter, 2160p video quality and best audio quality will be automatically selected for download.\n")
+            return '2160p'
         
         if 'best-a' in user_flag:
             print("Now for every link you enter the best audio quality will be selected for download automatically.\n")
