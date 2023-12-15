@@ -24,6 +24,7 @@ This Python application allows users to download videos, audio, and thumbnails f
     - `best-v`: Automatically selects the best video and audio quality for each link.
     - `1080p`: Automatically selects 1080p video and best audio quality for each link. If there is no 1080p quality, selects the best video and audio quality.
     - `1440p`: Automatically selects 1440p video and best audio quality for each link. If there is no 1440p quality, selects the best video and audio quality.
+    - `2160p`: Automatically selects 2160p video and best audio quality for each link. If there is no 2160p quality, selects the best video and audio quality.
     - `best-a`: Automatically selects the best audio quality.
     - `thumbnail`: Automatically downloads the thumbnail of the video.
     - Press Enter without inputting a flag to choose download options manually for each link.
