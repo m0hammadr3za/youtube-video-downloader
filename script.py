@@ -1,7 +1,7 @@
 import yt_dlp
 from processors import get_video_formats, get_audio_formats
 from utils import readable_size
-from downloader import download_video, download_audio, download_thumbnail
+from downloader import download_video, download_audio, download_mp3_audio, download_thumbnail
 
 from inputs import \
     get_output_path, \
@@ -65,6 +65,8 @@ def download_with_flag(flag, url, video_formats, audio_formats, output_path):
         handle_2160p_download(url, video_formats, audio_formats, output_path)
     elif flag == 'best-a':
         handle_best_a_download(url, audio_formats, output_path)
+    elif flag == 'best-mp3':
+        handle_best_mp3_download(url, audio_formats, output_path)
     elif flag == 'thumbnail':
         handle_thumbnail_download(url, output_path)
 
@@ -155,7 +157,16 @@ def handle_best_a_download(url, audio_formats, output_path):
     audio_format_id = best_audio_format['format_id']
 
     print(f"Downloading {best_audio_format_key} audio...")
-    download_audio(url, audio_format_id['format_id'], output_path)
+    download_audio(url, audio_format_id, output_path)
+
+def handle_best_mp3_download(url, audio_formats, output_path):
+    audio_format_keys = list(audio_formats.keys())
+    best_audio_format_key = audio_format_keys[0]
+    best_audio_format = audio_formats[best_audio_format_key]
+    audio_format_id = best_audio_format['format_id']
+
+    print(f"Downloading {best_audio_format_key} audio and converting to mp3...")
+    download_mp3_audio(url, audio_format_id, output_path)
 
 def handle_thumbnail_download(url, output_path):
     print("Downloading thumbnail...")

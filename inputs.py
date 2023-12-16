@@ -20,6 +20,7 @@ def get_flag():
     print(f"    [1440p] download 1440p with best audio(download best quality if 1440p is not available)")
     print(f"    [2160p] download 2160p with best audio(download best quality if 2160p is not available)")
     print(f"    [best-a] download best audio")
+    print(f"    [best-mp3] download best audio and converts it to mp3")
     print(f"    [thumbnail] download thumbnail")
     print()
     
@@ -47,8 +48,12 @@ def get_flag():
             return '2160p'
         
         if 'best-a' in user_flag:
-            print("Now for every link you enter the best audio quality will be selected for download automatically.\n")
-            return 'best-v'
+            print("Now for every link you enter the best audio quality will be automatically selected for download.\n")
+            return 'best-a'
+        
+        if 'best-mp3' in user_flag:
+            print("Now for every link you enter the best audio quality will be automatically selected for download, after download is completed  it will convert the audio file to mp3 format.\n")
+            return 'best-mp3'
         
         if 'thumbnail' in user_flag:
             print("Now for every link you enter the thumbnail of the video will be downloaded.\n")
