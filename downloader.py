@@ -54,7 +54,7 @@ def download_mp3_audio(url, format_id, output_path):
         ydl.download([url])
 
 def download_thumbnail(video_url, output_path):
-    outtmpl = 'thumbnail.%(ext)s' if output_path is None else os.path.join(output_path, 'thumbnail.%(ext)s')
+    outtmpl = '%(title)s.%(ext)s' if output_path is None else os.path.join(output_path, '%(title)s.%(ext)s')
     
     ydl_opts = {
         'skip_download': True,
